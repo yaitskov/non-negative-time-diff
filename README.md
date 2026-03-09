@@ -12,7 +12,7 @@ f = do
 ```
 
 This package provides a stricter `diffUTCTime` that significantly
-reduces possibility to mix its arguments by an accident.
+reduces possibility of mixing its arguments by an accident.
 
 ``` haskell
 import Data.Time.Clock.NonNegativeTimeDiff
@@ -78,14 +78,13 @@ isFileOlderThan fp maxAge = do
     removeFile fp
 ```
 
-File age is always negative in the above example - thit eventually
-would cause a space leak on a disk.
+File age is always negative in the above example - this eventually
+would cause a space leak on disk.
 
 Corrected version:
 ``` haskell
 isFileOlderThan :: FilePath -> NominalDiffTime -> IO Bool
-isFileOlderThan fp maxAge = do
-  now <- getCurrentTime
+isFileOlderThan fp maxAge =
   getModificationTime fp >>= (`doAfter` \mt -> do
     now <- getTimeAfter mt
     when (now `diffUTCTime` mt > maxAge) $ do
