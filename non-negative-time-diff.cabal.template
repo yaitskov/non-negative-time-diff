@@ -1,0 +1,52 @@
+cabal-version: 3.0
+name:          non-negative-time-diff
+version:       0.0.1
+
+synopsis:      type safe diffUTCTime
+description:
+homepage:      http://github.com/yaitskov/non-negative-time-diff
+license:       BSD-3-Clause
+license-file:  LICENSE
+author:        Daniil Iaitskov
+maintainer:    dyaitskov@gmail.com
+copyright:     Daniil Iaitkov 2026
+category:      System
+build-type:    Simple
+bug-reports:   https://github.com/yaitskov/non-negative-time-diff/issues
+
+extra-doc-files:
+  changelog.md
+tested-with:
+  GHC == 9.12.2
+
+source-repository head
+  type:
+    git
+  location:
+    https://github.com/yaitskov/non-negative-time-diff.git
+
+common base
+  default-language: GHC2024
+  ghc-options: -Wall  -fplugin GHC.TypeLits.Normalise
+  default-extensions:
+    DefaultSignatures
+    NoImplicitPrelude
+    TypeFamilies
+    ViewPatterns
+  build-depends:
+    , base >=4.7 && < 5
+
+library
+  import: base
+  hs-source-dirs: src
+  exposed-modules:
+    Data.Time.Clock.NonNegativeTimeDiff
+  build-depends:
+    , aeson                   < 3
+    , bytestring              < 1
+    , deepseq                 < 2
+    , directory               < 2
+    , ghc-typelits-natnormalise < 1
+    , mtl                     < 3
+    , safecopy                < 1
+    , time                    < 2
