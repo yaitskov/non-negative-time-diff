@@ -23,7 +23,7 @@ f = do
   pure $ ended `diffUTCTime` started
 ```
 
-## STM usecase
+## STM use case
 The STM package is shipped without a function to get current time.
 Let's consider a situtation like this:
 
@@ -89,4 +89,14 @@ isFileOlderThan fp maxAge =
     now <- getTimeAfter mt
     when (now `diffUTCTime` mt > maxAge) $ do
       removeFile fp)
+```
+
+## Requirements
+
+Unboxing `UtcBox` values requires a GHC [natnormalise
+plugin](https://hackage.haskell.org/package/ghc-typelits-natnormalise):
+
+``` haskell
+{-# GHC_OPTIONS -fplugin GHC.TypeLits.Normalise #-}
+
 ```
