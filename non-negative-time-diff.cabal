@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          non-negative-time-diff
-version:       0.0.1
+version:       0.0.2
 
 synopsis:      type safe diffUTCTime
 description:
@@ -94,6 +94,16 @@ description:
     <https://hackage.haskell.org/package/ghc-typelits-natnormalise natnormalise plugin>:
     
     > {-# GHC_OPTIONS -fplugin GHC.TypeLits.Normalise #-}
+    
+    === Static linking
+    #static-linking#
+    
+    In case of static linking define macro @STATIC@ to disable natnormalise
+    GHC plugin that is not available in such setup. UtcBox version for the
+    static build is less strict, because it does not have existential
+    variable.
+    
+    > cabal build --ghc-option=-optP=-DSTATIC
 homepage:      http://github.com/yaitskov/non-negative-time-diff
 license:       BSD-3-Clause
 license-file:  LICENSE

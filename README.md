@@ -100,3 +100,14 @@ plugin](https://hackage.haskell.org/package/ghc-typelits-natnormalise):
 {-# GHC_OPTIONS -fplugin GHC.TypeLits.Normalise #-}
 
 ```
+
+### Static linking
+
+In case of static linking define macro `STATIC` to disable
+natnormalise GHC plugin that is not available in such setup. UtcBox
+version for the static build is less strict, because it does not have
+existential variable.
+
+```shell
+cabal build --ghc-option=-optP=-DSTATIC
+```
