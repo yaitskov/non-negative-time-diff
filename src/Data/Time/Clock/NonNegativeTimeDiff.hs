@@ -1,3 +1,9 @@
+{-# LANGUAGE CPP #-}
+-- #define STATIC
+#if !defined(STATIC)
+{-# OPTIONS_GHC -fplugin GHC.TypeLits.Normalise #-}
+#endif
+
 module Data.Time.Clock.NonNegativeTimeDiff
   ( UtcBox
   , UTCTime
@@ -16,7 +22,7 @@ import Data.Aeson ( FromJSON(parseJSON), ToJSON(toJSON) )
 import Data.Coerce ( coerce )
 import Data.Time.Clock qualified as C
 import Data.SafeCopy
-    ( SafeCopy(putCopy, getCopy), contain, safeGet, safePut )
+     ( SafeCopy(putCopy, getCopy), contain, safeGet, safePut )
 import GHC.Conc ( STM, unsafeIOToSTM )
 import GHC.Generics ( Generic )
 import GHC.TypeLits ( TypeError, type (+), type (<=?), ErrorMessage(Text), Nat )
@@ -24,19 +30,25 @@ import GHC.TypeError ( Assert )
 import Prelude
 import System.Directory qualified as D
 
-newtype UTCTime (n :: Nat)
-  = UTCTime
-  { unUTCTime :: C.UTCTime }
+newtype UTCTime (n :: Nat) = UTCTime { unUTCTime :: C.UTCTime }
   deriving newtype (Show, Eq, Ord, Generic, Read, NFData)
 
 class Monad m => ClockMonad m where
   getCurrentTime :: m (UTCTime 0)
   getTimeAfter :: UTCTime n -> m (UTCTime (n + 1))
 
+#if !defined(STATIC)
 data UtcBox = forall n. UtcBox (UTCTime n)
+#else
+newtype UtcBox = UtcBox (UTCTime 0)
+#endif
 
 mkUtcBox :: UTCTime n -> UtcBox
+#if defined(STATIC)
+mkUtcBox (UTCTime ut) = UtcBox $ UTCTime ut
+#else
 mkUtcBox = UtcBox
+#endif
 
 instance NFData UtcBox where
   rnf (UtcBox u) = rnf u
@@ -54,7 +66,11 @@ instance SafeCopy UtcBox where
   putCopy (UtcBox (UTCTime ut)) = contain $ safePut ut
   getCopy= contain $ UtcBox . UTCTime <$> safeGet
 
+#if defined(STATIC)
+doAfter :: ClockMonad m => UtcBox -> (UTCTime 0 -> m b) -> m b
+#else
 doAfter :: ClockMonad m => UtcBox -> (forall n. (UTCTime n -> m b)) -> m b
+#endif
 doAfter (UtcBox u) m = m u
 
 getModificationTime :: MonadIO m => FilePath -> m UtcBox

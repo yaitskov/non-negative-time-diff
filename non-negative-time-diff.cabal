@@ -14,7 +14,7 @@ description:
     >   pure $ started `diffUTCTime` ended
     
     This package provides a stricter @diffUTCTime@ that significantly
-    reduces possibility to mix its arguments by an accident.
+    reduces possibility of mixing its arguments by an accident.
     
     > import Data.Time.Clock.NonNegativeTimeDiff
     > f = do
@@ -23,8 +23,8 @@ description:
     >   ended <- getTimeAfter started
     >   pure $ ended `diffUTCTime` started
     
-    == STM usecase
-    #stm-usecase#
+    == STM use case
+    #stm-use-case#
     
     The STM package is shipped without a function to get current time. Let’s
     consider a situtation like this:
@@ -75,18 +75,25 @@ description:
     >   when (mt `diffUTCTime` now > maxAge) $ do
     >     removeFile fp
     
-    File age is always negative in the above example - thit eventually would
-    cause a space leak on a disk.
+    File age is always negative in the above example - this eventually would
+    cause a space leak on disk.
     
     Corrected version:
     
     > isFileOlderThan :: FilePath -> NominalDiffTime -> IO Bool
-    > isFileOlderThan fp maxAge = do
-    >   now <- getCurrentTime
+    > isFileOlderThan fp maxAge =
     >   getModificationTime fp >>= (`doAfter` \mt -> do
     >     now <- getTimeAfter mt
     >     when (now `diffUTCTime` mt > maxAge) $ do
     >       removeFile fp)
+    
+    == Requirements
+    #requirements#
+    
+    Unboxing @UtcBox@ values requires a GHC
+    <https://hackage.haskell.org/package/ghc-typelits-natnormalise natnormalise plugin>:
+    
+    > {-# GHC_OPTIONS -fplugin GHC.TypeLits.Normalise #-}
 homepage:      http://github.com/yaitskov/non-negative-time-diff
 license:       BSD-3-Clause
 license-file:  LICENSE
@@ -110,7 +117,7 @@ source-repository head
 
 common base
   default-language: GHC2024
-  ghc-options: -Wall  -fplugin GHC.TypeLits.Normalise
+  ghc-options: -Wall
   default-extensions:
     DefaultSignatures
     NoImplicitPrelude

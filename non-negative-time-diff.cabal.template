@@ -27,7 +27,7 @@ source-repository head
 
 common base
   default-language: GHC2024
-  ghc-options: -Wall  -fplugin GHC.TypeLits.Normalise
+  ghc-options: -Wall
   default-extensions:
     DefaultSignatures
     NoImplicitPrelude
